@@ -2,10 +2,10 @@
 
 enum sequence
 {
-	first = 0b10000001,
-	second = 0b01000010,
-	third = 0b00100100,
-	fourth = 0b00011000
+	first = 1<<0 | 1<<7,
+	second = 1<<1 | 1<<6,
+	third = 1<<2 | 1<<5,
+	fourth = 1<<3 | 1<<4
 };
 
 uint32_t count_score();
@@ -28,7 +28,7 @@ int main()
 	uint32_t led2_pos = 0;
 	uint32_t led3_pos = 0;
 	uint32_t led4_pos = 0;
-	uint32_t current_pos = 0b00000001;
+	uint32_t current_pos = 1<<0;
 
 	while(1)
 	{
@@ -39,6 +39,7 @@ int main()
 			dummy_delay(1000000);
 			GPIOA->ODR &= ~GPIO_ODR_OD5;
 			current_pos <<= 1;
+			while(GPIOA->IDR & GPIO_IDR_ID0);
 		}
 		if(GPIOA->IDR & GPIO_IDR_ID1)
 		{
@@ -47,6 +48,7 @@ int main()
 			dummy_delay(1000000);
 			GPIOA->ODR &= ~GPIO_ODR_OD6;
 			current_pos <<= 1;
+			while(GPIOA->IDR & GPIO_IDR_ID1);
 		}
 		if(GPIOC->IDR & GPIO_IDR_ID2)
 		{
@@ -55,6 +57,7 @@ int main()
 			dummy_delay(1000000);
 			GPIOA->ODR &= ~GPIO_ODR_OD8;
 			current_pos <<= 1;
+			while(GPIOC->IDR & GPIO_IDR_ID2);
 		}
 		if(GPIOC->IDR & GPIO_IDR_ID3)
 		{
@@ -63,8 +66,9 @@ int main()
 			dummy_delay(1000000);
 			GPIOA->ODR &= ~GPIO_ODR_OD7;
 			current_pos <<= 1;
+			while(GPIOC->IDR & GPIO_IDR_ID3);
 		}
-		if(current_pos == 256)
+		if(current_pos == 1<<8)
 		{
 			turnoff_leds();
 			if(attempts == 3)
@@ -72,7 +76,6 @@ int main()
 				while(1)
 				{
 					error_animation();
-					dummy_delay(500000);
 				}
 			}
 			if(led1_pos == first && led2_pos == second && led3_pos == third && led4_pos == fourth)
@@ -80,19 +83,17 @@ int main()
 				while(1)
 				{
 					victory_animation();
-					dummy_delay(500000);
 				}
 			}
 			else
 			{
-				for(int i = 0;i<3;i++)
+				for(uint32_t i = 0;i<3;i++)
 				{
 					error_animation();
-					dummy_delay(500000);
 				}
 			}
 			attempts++;
-			current_pos = 0x01;
+			current_pos = 1<<0;
 			led1_pos = led2_pos = led3_pos = led4_pos = 0;
 		}
 	}
@@ -123,6 +124,7 @@ void victory_animation()
 	GPIOA->ODR &= ~GPIO_ODR_OD7;
 	dummy_delay(500000);
 	GPIOA->ODR &= ~GPIO_ODR_OD8;
+	dummy_delay(500000);
 }
 
 void error_animation()
@@ -130,4 +132,5 @@ void error_animation()
 	GPIOA->ODR |= (GPIO_ODR_OD5 | GPIO_ODR_OD6 | GPIO_ODR_OD7 | GPIO_ODR_OD8);
 	dummy_delay(1000000);
 	GPIOA->ODR &= ~(GPIO_ODR_OD5 | GPIO_ODR_OD6 | GPIO_ODR_OD7 | GPIO_ODR_OD8);
+	dummy_delay(1000000);
 }

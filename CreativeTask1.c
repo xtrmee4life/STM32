@@ -1,6 +1,8 @@
 #include <stm32g431xx.h>
 
-void dummy_delay(),victory_animation(),error_animation();
+void dummy_delay();
+void run_victory_animation();
+void run_error_animation();
 
 int main()
 {
@@ -14,23 +16,18 @@ int main()
 	uint32_t mode = 0;
 	while(1)
 	{
-		if(GPIOC->IDR & GPIO_IDR_ID2)mode = !mode;
+		if(GPIOC->IDR & GPIO_IDR_ID2)
+		{
+			mode = !mode;
+			while(GPIOC->IDR & GPIO_IDR_ID2);
+		}
 		if(mode == 0)
 		{
-			while(1)
-			{
-				error_animation();
-				dummy_delay(1000000);
-				if(GPIOC->IDR & GPIO_IDR_ID2)
-				{
-					mode = !mode;
-					break;
-				}
-			}
+			run_error_animation();
 		}
 		if(mode == 1)
 		{
-			victory_animation();
+			run_victory_animation();
 			mode = 2;
 		}
 	}
@@ -40,7 +37,7 @@ void dummy_delay(int32_t duration)
    for(int32_t i = 0; i < duration; ++i);
 }
 
-void victory_animation()
+void run_victory_animation()
 {
 	GPIOA->ODR |= GPIO_ODR_OD5;
 	dummy_delay(500000);
@@ -55,11 +52,13 @@ void victory_animation()
 	GPIOA->ODR &= ~GPIO_ODR_OD7;
 	dummy_delay(500000);
 	GPIOA->ODR &= ~GPIO_ODR_OD8;
+	dummy_delay(500000);
 }
 
-void error_animation()
+void run_error_animation()
 {
 	GPIOA->ODR |= (GPIO_ODR_OD5 | GPIO_ODR_OD6 | GPIO_ODR_OD7 | GPIO_ODR_OD8);
 	dummy_delay(1000000);
 	GPIOA->ODR &= ~(GPIO_ODR_OD5 | GPIO_ODR_OD6 | GPIO_ODR_OD7 | GPIO_ODR_OD8);
+	dummy_delay(1000000);
 }

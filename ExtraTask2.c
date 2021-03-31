@@ -2,18 +2,18 @@
 
 enum sequence
 {
-	first = 0b00001000,
-	second = 0b00000100,
-	third = 0b00000010,
-	fourth = 0b00000001
+	first = 1<<3,
+	second = 1<<2,
+	third = 1<<1,
+	fourth = 1<<0
 };
 
 uint32_t count_score();
 void blink_leds(uint32_t);
 void turnoff_leds();
 void dummy_delay(uint32_t);
-void victory_animation();
-void error_animation();
+void run_victory_animation();
+void run_error_animation();
 int main()
 {
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN;
@@ -28,7 +28,7 @@ int main()
 	uint32_t led2_pos = 0;
 	uint32_t led3_pos = 0;
 	uint32_t led4_pos = 0;
-	uint32_t current_pos = 0b00000001;
+	uint32_t current_pos = 1<<0;
 
 	while(1)
 	{
@@ -37,54 +37,55 @@ int main()
 			GPIOA->ODR |= GPIO_ODR_OD5;
 			led1_pos |= current_pos;
 			current_pos <<= 1;
+			while(GPIOA->IDR & GPIO_IDR_ID0);
 		}
 		if(GPIOA->IDR & GPIO_IDR_ID1 && led2_pos == 0)
 		{
 			GPIOA->ODR |= GPIO_ODR_OD6;
 			led2_pos |= current_pos;
 			current_pos <<= 1;
+			while(GPIOA->IDR & GPIO_IDR_ID1);
 		}
 		if(GPIOC->IDR & GPIO_IDR_ID2 && led3_pos == 0)
 		{
 			GPIOA->ODR |= GPIO_ODR_OD8;
 			led3_pos |= current_pos;
 			current_pos <<= 1;
+			while(GPIOC->IDR & GPIO_IDR_ID2);
 		}
 		if(GPIOC->IDR & GPIO_IDR_ID3 && led4_pos == 0)
 		{
 			GPIOA->ODR |= GPIO_ODR_OD7;
 			led4_pos |= current_pos;
 			current_pos <<= 1;
+			while(GPIOC->IDR & GPIO_IDR_ID2);
 		}
-		if(current_pos == 0x10)
+		if(current_pos == 1<<4)
 		{
 			turnoff_leds();
 			if(attempts == 3)
 			{
 				while(1)
 				{
-					error_animation();
-					dummy_delay(500000);
+					run_error_animation();
 				}
 			}
 			if(led1_pos == first && led2_pos == second && led3_pos == third && led4_pos == fourth)
 			{
 				while(1)
 				{
-					victory_animation();
-					dummy_delay(500000);
+					run_victory_animation();
 				}
 			}
 			else
 			{
-				for(int i = 0;i<3;i++)
+				for(uint32_t i = 0;i<=3;i++)
 				{
-					error_animation();
-					dummy_delay(500000);
+					run_error_animation();
 				}
 			}
 			attempts++;
-			current_pos = 0x01;
+			current_pos = 1 << 0;
 			led1_pos = led2_pos = led3_pos = led4_pos = 0;
 		}
 		dummy_delay(250000);
@@ -100,7 +101,7 @@ void turnoff_leds()
 {
 	GPIOA->ODR &= ~(GPIO_ODR_OD5 | GPIO_ODR_OD6 | GPIO_ODR_OD7 | GPIO_ODR_OD8);
 }
-void victory_animation()
+void run_victory_animation()
 {
 	GPIOA->ODR |= GPIO_ODR_OD5;
 	dummy_delay(500000);
@@ -115,11 +116,13 @@ void victory_animation()
 	GPIOA->ODR &= ~GPIO_ODR_OD7;
 	dummy_delay(500000);
 	GPIOA->ODR &= ~GPIO_ODR_OD8;
+	dummy_delay(500000);
 }
 
-void error_animation()
+void run_error_animation()
 {
 	GPIOA->ODR |= (GPIO_ODR_OD5 | GPIO_ODR_OD6 | GPIO_ODR_OD7 | GPIO_ODR_OD8);
 	dummy_delay(1000000);
 	GPIOA->ODR &= ~(GPIO_ODR_OD5 | GPIO_ODR_OD6 | GPIO_ODR_OD7 | GPIO_ODR_OD8);
+	dummy_delay(1000000);
 }

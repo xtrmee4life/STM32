@@ -1,4 +1,5 @@
 #include <stm32g431xx.h>
+
 int main()
 {
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN;
@@ -9,32 +10,21 @@ int main()
 	GPIOC->MODER &= ~(GPIO_MODER_MODE2_Msk | GPIO_MODER_MODE3_Msk);
 	while(1)
 	{
-		if(GPIOC->IDR & GPIO_IDR_ID2 && GPIOC->IDR & GPIO_IDR_ID3)
+		if(GPIOC->IDR & GPIO_IDR_ID2)
 		{
-			GPIOA->ODR |= GPIO_ODR_OD5 | GPIO_ODR_OD8;
-		}
-		else if(GPIOC->IDR & GPIO_IDR_ID2)
-		{
-			if(GPIOA->ODR & GPIO_ODR_OD8)
-			{
-				dummy_delay(250000);
-				GPIOA->ODR &= ~GPIO_ODR_OD8;
-			}
 			GPIOA->ODR |= GPIO_ODR_OD5;
 		}
-		else if(GPIOC->IDR & GPIO_IDR_ID3)
+		else
 		{
-			if(GPIOA->ODR & GPIO_ODR_OD5)
-			{
-				dummy_delay(250000);
-				GPIOA->ODR &= ~GPIO_ODR_OD5;
-			}
+			GPIOA->ODR &= ~(GPIO_ODR_OD5);
+		}
+		if(GPIOC->IDR & GPIO_IDR_ID3)
+		{
 			GPIOA->ODR |= GPIO_ODR_OD8;
 		}
 		else
 		{
-			dummy_delay(250000);
-			GPIOA->ODR &= ~(GPIO_ODR_OD5 | GPIO_ODR_OD8);
+			GPIOA->ODR &= ~(GPIO_ODR_OD8);
 		}
 	}
 }
