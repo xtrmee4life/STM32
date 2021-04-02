@@ -20,7 +20,7 @@ int main()
 		{
 			score = 0;
 		}
-		if(GPIOA->IDR & GPIO_IDR_ID1 && (GPIOA->IDR & GPIO_IDR_ID0) == 0 && (GPIOC->IDR & GPIO_IDR_ID3) == 0 && score > 0)
+		if(GPIOA->IDR & GPIO_IDR_ID1 && (GPIOA->IDR & GPIO_IDR_ID0) == 0 && (GPIOC->IDR & GPIO_IDR_ID3) == 0)
 		{
 			score -= 1;
 			while(GPIOA->IDR & GPIO_IDR_ID1);
@@ -31,7 +31,7 @@ int main()
 			while(GPIOA->IDR & GPIO_IDR_ID0);
 		}
 		turnoff_leds();
-		GPIOA->ODR |= (score & 15) << 5;
+		GPIOA->ODR |= (score & 0x0F) << 5;
 		dummy_delay(250000);
 	}
 }

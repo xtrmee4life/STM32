@@ -28,36 +28,36 @@ int main()
 	uint32_t led2_pos = 0;
 	uint32_t led3_pos = 0;
 	uint32_t led4_pos = 0;
-	uint32_t current_pos = 1<<0;
+	uint32_t current_pos = 0;
 
 	while(1)
 	{
 		if(GPIOA->IDR & GPIO_IDR_ID0 && led1_pos == 0)
 		{
 			GPIOA->ODR |= GPIO_ODR_OD5;
-			led1_pos |= current_pos;
-			current_pos <<= 1;
+			led1_pos |= 1 << current_pos;
+			current_pos++;
 			while(GPIOA->IDR & GPIO_IDR_ID0);
 		}
 		if(GPIOA->IDR & GPIO_IDR_ID1 && led2_pos == 0)
 		{
 			GPIOA->ODR |= GPIO_ODR_OD6;
 			led2_pos |= current_pos;
-			current_pos <<= 1;
+			current_pos++;
 			while(GPIOA->IDR & GPIO_IDR_ID1);
 		}
 		if(GPIOC->IDR & GPIO_IDR_ID2 && led3_pos == 0)
 		{
 			GPIOA->ODR |= GPIO_ODR_OD8;
 			led3_pos |= current_pos;
-			current_pos <<= 1;
+			current_pos++;
 			while(GPIOC->IDR & GPIO_IDR_ID2);
 		}
 		if(GPIOC->IDR & GPIO_IDR_ID3 && led4_pos == 0)
 		{
 			GPIOA->ODR |= GPIO_ODR_OD7;
 			led4_pos |= current_pos;
-			current_pos <<= 1;
+			current_pos++;
 			while(GPIOC->IDR & GPIO_IDR_ID2);
 		}
 		if(current_pos == 1<<4)
@@ -85,7 +85,7 @@ int main()
 				}
 			}
 			attempts++;
-			current_pos = 1 << 0;
+			current_pos = 0;
 			led1_pos = led2_pos = led3_pos = led4_pos = 0;
 		}
 		dummy_delay(250000);
