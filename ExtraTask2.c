@@ -23,7 +23,7 @@ int main()
 
 	GPIOA->MODER &= ~(GPIO_MODER_MODE0_Msk | GPIO_MODER_MODE1_Msk);
 	GPIOC->MODER &= ~(GPIO_MODER_MODE2_Msk | GPIO_MODER_MODE3_Msk);
-	uint32_t attempts = 1;
+	uint32_t attempts = 0;
 	uint32_t led1_pos = 0;
 	uint32_t led2_pos = 0;
 	uint32_t led3_pos = 0;
@@ -42,21 +42,21 @@ int main()
 		if(GPIOA->IDR & GPIO_IDR_ID1 && led2_pos == 0)
 		{
 			GPIOA->ODR |= GPIO_ODR_OD6;
-			led2_pos |= current_pos;
+			led2_pos |= 1 << current_pos;
 			current_pos++;
 			while(GPIOA->IDR & GPIO_IDR_ID1);
 		}
 		if(GPIOC->IDR & GPIO_IDR_ID2 && led3_pos == 0)
 		{
 			GPIOA->ODR |= GPIO_ODR_OD8;
-			led3_pos |= current_pos;
+			led3_pos |= 1 << current_pos;
 			current_pos++;
 			while(GPIOC->IDR & GPIO_IDR_ID2);
 		}
 		if(GPIOC->IDR & GPIO_IDR_ID3 && led4_pos == 0)
 		{
 			GPIOA->ODR |= GPIO_ODR_OD7;
-			led4_pos |= current_pos;
+			led4_pos |= 1 << current_pos;
 			current_pos++;
 			while(GPIOC->IDR & GPIO_IDR_ID2);
 		}
