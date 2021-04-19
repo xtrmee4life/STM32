@@ -1,5 +1,7 @@
 #include <stm32g431xx.h>
 
+#define LASTATTEMPT 3
+#define ENDOFSEQUENCE 4
 enum sequence
 {
 	first = 1<<3,
@@ -45,13 +47,8 @@ int main()
 
 	while(1)
 	{
-		if(current_pos == 4)
+		if(current_pos == ENDOFSEQUENCE)
 		{
-			NVIC_DisableIRQ(EXTI0_IRQn);
-			NVIC_DisableIRQ(EXTI1_IRQn);
-			NVIC_DisableIRQ(EXTI2_IRQn);
-			NVIC_DisableIRQ(EXTI3_IRQn);
-			EXTI->IMR1 &= ~(EXTI_IMR1_IM0 | EXTI_IMR1_IM1 | EXTI_IMR1_IM2 | EXTI_IMR1_IM3);
 			turnoff_leds();
 			if(led1_pos == first && led2_pos == second && led3_pos == third && led4_pos == fourth)
 			{
@@ -67,7 +64,7 @@ int main()
 					run_error_animation();
 				}
 			}
-			if(attempt == 3)
+			if(attempt == LASTATTEMPT)
 			{
 				while(1)
 				{
@@ -77,18 +74,13 @@ int main()
 			attempt++;
 			current_pos = 0;
 			led1_pos = led2_pos = led3_pos = led4_pos = 0;
-			NVIC_EnableIRQ(EXTI0_IRQn);
-			NVIC_EnableIRQ(EXTI1_IRQn);
-			NVIC_EnableIRQ(EXTI2_IRQn);
-			NVIC_EnableIRQ(EXTI3_IRQn);
-			EXTI->IMR1 |= EXTI_IMR1_IM0 | EXTI_IMR1_IM1 | EXTI_IMR1_IM2 | EXTI_IMR1_IM3;
 		}
 	}
 }
 
 void EXTI0_IRQHandler()
 {
-	if(led1_pos == 0)
+	if(led1_pos == 0 && current_pos != ENDOFSEQUENCE)
 	{
 		GPIOA->BSRR = GPIO_BSRR_BS5;
 		led1_pos |= 1 << current_pos;
@@ -99,7 +91,7 @@ void EXTI0_IRQHandler()
 }
 void EXTI1_IRQHandler()
 {
-	if(led2_pos == 0)
+	if(led2_pos == 0 && current_pos != ENDOFSEQUENCE)
 	{
 		GPIOA->BSRR = GPIO_BSRR_BS6;
 		led2_pos |= 1 << current_pos;
@@ -110,7 +102,7 @@ void EXTI1_IRQHandler()
 }
 void EXTI2_IRQHandler()
 {
-	if(led3_pos == 0)
+	if(led3_pos == 0 && current_pos != ENDOFSEQUENCE)
 	{
 		GPIOA->BSRR = GPIO_BSRR_BS7;
 		led3_pos |= 1 << current_pos;
@@ -121,7 +113,7 @@ void EXTI2_IRQHandler()
 }
 void EXTI3_IRQHandler()
 {
-	if(led4_pos == 0)
+	if(led4_pos == 0 && current_pos != ENDOFSEQUENCE)
 	{
 		GPIOA->BSRR = GPIO_BSRR_BS8;
 		led4_pos |= 1 << current_pos;

@@ -13,16 +13,16 @@ int main()
 	EXTI->RTSR1 |= EXTI_RTSR1_RT0 | EXTI_RTSR1_RT1 | EXTI_RTSR1_RT2 | EXTI_RTSR1_RT3;
 	EXTI->FTSR1 |= EXTI_FTSR1_FT0 | EXTI_FTSR1_FT1 | EXTI_FTSR1_FT2 | EXTI_FTSR1_FT3;
 
-	NVIC_EnableIRQ(EXTI0_IRQn);
-	NVIC_EnableIRQ(EXTI1_IRQn);
-	NVIC_EnableIRQ(EXTI2_IRQn);
-	NVIC_EnableIRQ(EXTI3_IRQn);
-
 	GPIOA->MODER &= ~(GPIO_MODER_MODE8_Msk | GPIO_MODER_MODE7_Msk | GPIO_MODER_MODE6_Msk | GPIO_MODER_MODE5_Msk);
 	GPIOA->MODER |= (1 << GPIO_MODER_MODE8_Pos | 1 << GPIO_MODER_MODE7_Pos | 1 << GPIO_MODER_MODE6_Pos | 1 << GPIO_MODER_MODE5_Pos);
 
 	GPIOA->MODER &= ~(GPIO_MODER_MODE0_Msk | GPIO_MODER_MODE1_Msk);
 	GPIOC->MODER &= ~(GPIO_MODER_MODE2_Msk | GPIO_MODER_MODE3_Msk);
+
+	NVIC_EnableIRQ(EXTI0_IRQn);
+	NVIC_EnableIRQ(EXTI1_IRQn);
+	NVIC_EnableIRQ(EXTI2_IRQn);
+	NVIC_EnableIRQ(EXTI3_IRQn);
 
 	NVIC_SetPriority(EXTI0_IRQn,15);
 	NVIC_SetPriority(EXTI1_IRQn,14);
@@ -37,57 +37,26 @@ int main()
 
 void EXTI0_IRQHandler()
 {
-	/*
-	 * тут везде,наверное,быстрее(или одинаково)будет обычный XOR
-	 */
-	dummy_delay(2000000);
-	if(GPIOA->ODR & GPIO_ODR_OD5)
-	{
-		GPIOA->BSRR = GPIO_BSRR_BR5;
-	}
-	else
-	{
-		GPIOA->BSRR = GPIO_BSRR_BS5;
-	}
+	dummy_delay(1000000);
+	GPIOA->ODR ^= GPIO_ODR_OD5;
 	EXTI->PR1 = EXTI_PR1_PIF0;
 }
 void EXTI1_IRQHandler()
 {
-	dummy_delay(2000000);
-	if(GPIOA->ODR & GPIO_ODR_OD6)
-	{
-		GPIOA->BSRR = GPIO_BSRR_BR6;
-	}
-	else
-	{
-		GPIOA->BSRR = GPIO_BSRR_BS6;
-	}
+	dummy_delay(1000000);
+	GPIOA->ODR ^= GPIO_ODR_OD6;
 	EXTI->PR1 = EXTI_PR1_PIF1;
 }
 void EXTI2_IRQHandler()
 {
-	dummy_delay(2000000);
-	if(GPIOA->ODR & GPIO_ODR_OD7)
-	{
-		GPIOA->BSRR = GPIO_BSRR_BR7;
-	}
-	else
-	{
-		GPIOA->BSRR = GPIO_BSRR_BS7;
-	}
+	dummy_delay(1000000);
+	GPIOA->ODR ^= GPIO_ODR_OD7;
 	EXTI->PR1 = EXTI_PR1_PIF2;
 }
 void EXTI3_IRQHandler()
 {
-	dummy_delay(2000000);
-	if(GPIOA->ODR & GPIO_ODR_OD8)
-	{
-		GPIOA->BSRR = GPIO_BSRR_BR8;
-	}
-	else
-	{
-		GPIOA->BSRR = GPIO_BSRR_BS8;
-	}
+	dummy_delay(1000000);
+	GPIOA->ODR ^= GPIO_ODR_OD8;
 	EXTI->PR1 = EXTI_PR1_PIF3;
 }
 void dummy_delay(uint32_t duration)
