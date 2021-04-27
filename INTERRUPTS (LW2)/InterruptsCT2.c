@@ -2,6 +2,7 @@
 
 void dummy_delay(uint32_t duration);
 
+uint32_t value = 0;
 int main()
 {
 	RCC->AHB2ENR |= RCC_AHB2ENR_GPIOAEN | RCC_AHB2ENR_GPIOCEN;
@@ -31,32 +32,29 @@ int main()
 
 	while(1)
 	{
-
+		dummy_delay(1000000);
+		GPIOA->ODR = value;
 	}
 }
 
 void EXTI0_IRQHandler()
 {
-	dummy_delay(1000000);
-	GPIOA->ODR ^= GPIO_ODR_OD5;
+	value = GPIOA->ODR ^ GPIO_ODR_OD5;
 	EXTI->PR1 = EXTI_PR1_PIF0;
 }
 void EXTI1_IRQHandler()
 {
-	dummy_delay(1000000);
-	GPIOA->ODR ^= GPIO_ODR_OD6;
+	value = GPIOA->ODR ^ GPIO_ODR_OD6;
 	EXTI->PR1 = EXTI_PR1_PIF1;
 }
 void EXTI2_IRQHandler()
 {
-	dummy_delay(1000000);
-	GPIOA->ODR ^= GPIO_ODR_OD7;
+	value = GPIOA->ODR ^ GPIO_ODR_OD7;
 	EXTI->PR1 = EXTI_PR1_PIF2;
 }
 void EXTI3_IRQHandler()
 {
-	dummy_delay(1000000);
-	GPIOA->ODR ^= GPIO_ODR_OD8;
+	value = GPIOA->ODR ^ GPIO_ODR_OD8;
 	EXTI->PR1 = EXTI_PR1_PIF3;
 }
 void dummy_delay(uint32_t duration)
